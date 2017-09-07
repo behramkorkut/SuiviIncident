@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">SuiviIncident</string>
+    <string name="header">Incidents check out</string>
+
+
+    <string name="hint_text">Empty here</string>
+    <string name="open_button">open</string>
+</resources>
