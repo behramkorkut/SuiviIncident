@@ -21,6 +21,7 @@ import com.yenimobile.suiviincident.model.Incident;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -60,11 +61,45 @@ public class MainActivity extends AppCompatActivity {
         Incident inc4 = new Incident("facture impayée", "01/02/17", "09/03/17");
 
 
+        //inserting incidents into db
+        //with the customer reliated to it
+        long inc1_id = db.createIncident(inc1, new long[] { cust1_id });
+        long inc2_id = db.createIncident(inc2, new long[] { cust2_id });
+        long inc3_id = db.createIncident(inc3, new long[] { cust3_id });
+        long inc4_id = db.createIncident(inc4, new long[] { cust4_id });
+
+        //we list all the customers
+        List<Customer> allCustomers = db.getAllCustomers();
+        for (Customer customer : allCustomers) {
+            Log.d("Customer Name", customer.getName());
+        }
+
+
+        //we list all the incidents
+        List<Incident> allIncidents = db.getAllIncidents();
+        for(Incident incident : allIncidents){
+            Log.d("Incident Name", incident.getName());
+        }
+
+
+
+
         /* initiate and populate the listview */
         MyAdapter adapter = new MyAdapter();
         ListView listView = (ListView) findViewById(R.id.listView);
 
+
+        //we add incidents to the list vew
+        for(Incident incident : allIncidents){
+            adapter.addIncident(incident);
+        }
+
         listView.setAdapter(adapter);
+
+
+
+        //closing db connexion
+        db.closeDB();
 
 
 

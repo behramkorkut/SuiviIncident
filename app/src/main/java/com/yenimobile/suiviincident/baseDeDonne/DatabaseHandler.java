@@ -150,7 +150,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         incident.setModifiedAt(c.getString(3));
         incident.setInProgress(Boolean.valueOf(c.getString(4)));
 
-        c.close();
+
         return incident;
     }
 
@@ -179,7 +179,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             } while (c.moveToNext());
         }
 
-        c.close();
+
         return incidentList;
     }
 
@@ -212,7 +212,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             } while (c.moveToNext());
         }
 
-        c.close();
+
 
         return incidentList;
     }
