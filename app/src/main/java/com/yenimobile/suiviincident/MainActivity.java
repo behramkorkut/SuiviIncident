@@ -116,6 +116,8 @@ public class MainActivity extends AppCompatActivity {
             notifyDataSetChanged();
         }
 
+
+
         @Override
         public int getCount() {
             return incidentArrayList.size();

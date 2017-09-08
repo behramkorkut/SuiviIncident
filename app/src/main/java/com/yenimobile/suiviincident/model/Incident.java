@@ -1,85 +1,141 @@
 package com.yenimobile.suiviincident.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.Date;
+
 /**
  * Created by bebeNokiaX6 on 06/09/2017.
  */
 
-public class Incident {
+public class Incident implements Parcelable {
 
-    private int mId;
-    private String mName;
+    private int id;
+    private String name;
+    private Date createdAt;
+    private Date modifiedAt;
+    private boolean inProgress;
+    private Customer customer;
 
-    private String mCreatedAt;
-    private String mModifiedAt;
-    private boolean mInProgress;
 
-    //empty constructor just in case
-    public Incident(){}
-
-    public Incident(String name){
-        this.mName = name;
+    public Incident() {
+        super();
     }
 
-    public Incident(String name, String createdAt, String modifiedAt){
-        this.mName = name;
-        this.mCreatedAt = createdAt;
-        this.mModifiedAt = modifiedAt;
-    }
+    private Incident(Parcel in) {
+        super();
+        this.id = in.readInt();
+        this.name = in.readString();
+        this.createdAt = new Date(in.readLong());
+        this.modifiedAt = new Date(in.readLong());
+        //this.inProgress = in.readBoolean();
 
-
-    public Incident(int id, String name){
-        this.mId = id;
-        this.mName = name;
+        this.customer = in.readParcelable(Customer.class.getClassLoader());
     }
-    //full constructor
-    public Incident(int id, String name, String dateCreation, String dateModification, boolean enCours){
-        this.mId = id;
-        this.mName = name;
-        this.mCreatedAt = dateCreation;
-        this.mModifiedAt = dateModification;
-        this.mInProgress = enCours;
-    }
-
 
     public int getId() {
-        return mId;
+        return id;
     }
 
-    public void setId(int mId) {
-        this.mId = mId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
-        return mName;
+        return name;
     }
 
-    public void setName(String mName) {
-        this.mName = mName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-
-
-    public String getCreatedAt() {
-        return mCreatedAt;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreatedAt(String mDateCreation) {
-        this.mCreatedAt = mDateCreation;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public String getModifiedAt() {
-        return mModifiedAt;
+    public Date getModifiedAt() {
+        return modifiedAt;
     }
 
-    public void setModifiedAt(String mDateModification) {
-        this.mModifiedAt = mDateModification;
+    public void setModifiedAt(Date modifiedAt) {
+        this.modifiedAt = modifiedAt;
     }
 
     public boolean isInProgress() {
-        return mInProgress;
+        return inProgress;
     }
 
-    public void setInProgress(boolean mEncours) {
-        this.mInProgress = mEncours;
+    public void setInProgress(boolean inProgress) {
+        this.inProgress = inProgress;
     }
+
+
+
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    @Override
+    public String toString() {
+        return "Incident [id=" + id + ", name=" + name + ", createdAt="
+                + createdAt + ", modifiedAt=" + modifiedAt + ", customer="
+                + customer + ", isInProgress="
+                + inProgress + "]";
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + id;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Incident other = (Incident) obj;
+        if (id != other.id)
+            return false;
+        return true;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeInt(getId());
+        parcel.writeString(getName());
+        parcel.writeLong(getCreatedAt().getTime());
+        parcel.writeLong(getModifiedAt().getTime());
+        parcel.writeParcelable(getCustomer(), flags);
+    }
+
+    public static final Parcelable.Creator<Incident> CREATOR = new Parcelable.Creator<Incident>() {
+        public Incident createFromParcel(Parcel in) {
+            return new Incident(in);
+        }
+
+        public Incident[] newArray(int size) {
+            return new Incident[size];
+        }
+    };
 }

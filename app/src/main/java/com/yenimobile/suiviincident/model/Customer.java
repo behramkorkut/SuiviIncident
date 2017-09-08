@@ -1,51 +1,105 @@
 package com.yenimobile.suiviincident.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by bebeNokiaX6 on 06/09/2017.
  */
 
-public class Customer {
+public class Customer implements Parcelable {
 
-    private int mId;
-    private String custumerName;
-    private String custumerFirstname;
+    private int id;
+    private String name;
+    private String firstname;
 
-    //empty constructor
     public Customer(){}
 
-    public Customer(String name, String firstname){
-        this.custumerName = name;
-        this.custumerFirstname = firstname;
+    public Customer(int id, String name, String firstname){
+        this.id = id;
+        this.name = name;
+        this.firstname = firstname;
     }
 
-    //full constructor
-    public Customer(int id, String name, String firstname){
-        this.mId = id;
-        this.custumerName = name;
-        this.custumerFirstname = firstname;
+    public Customer(String name){
+        this.name = name;
     }
+
 
     public int getId() {
-        return mId;
+        return id;
     }
 
-    public void setId(int mId) {
-        this.mId = mId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
-        return custumerName;
+        return name;
     }
 
-    public void setName(String mName) {
-        this.custumerName = mName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getFirstname() {
-        return custumerFirstname;
+        return firstname;
     }
 
-    public void setFirstname(String mFirstname) {
-        this.custumerFirstname = mFirstname;
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.id);
+        dest.writeString(this.name);
+        dest.writeString(this.firstname);
+    }
+
+    protected Customer(Parcel in) {
+        this.id = in.readInt();
+        this.name = in.readString();
+        this.firstname = in.readString();
+    }
+
+    public static final Parcelable.Creator<Customer> CREATOR = new Parcelable.Creator<Customer>() {
+        @Override
+        public Customer createFromParcel(Parcel source) {
+            return new Customer(source);
+        }
+
+        @Override
+        public Customer[] newArray(int size) {
+            return new Customer[size];
+        }
+    };
+
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + id;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Customer other = (Customer) obj;
+        if (id != other.id)
+            return false;
+        return true;
     }
 }

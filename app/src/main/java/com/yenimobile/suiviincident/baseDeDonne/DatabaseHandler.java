@@ -122,7 +122,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // insert row
         long incident_id = db.insert(TABLE_INCIDENT, null, values);
 
-        // assigning tags to todo
+
+
         for (long customer_id : customer_ids) {
             createIncidentCustomer(incident_id, customer_id);
         }
@@ -324,8 +325,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      * */
     @RequiresApi(api = Build.VERSION_CODES.N)
     private String getDateTime() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy", Locale.getDefault());
         Date date = new Date();
         return dateFormat.format(date);
     }
