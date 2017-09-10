@@ -1,166 +1,152 @@
 package com.yenimobile.suiviincident;
 
-import android.os.Build;
-import android.support.annotation.RequiresApi;
+import android.app.Activity;
+import android.os.AsyncTask;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.Button;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.yenimobile.suiviincident.baseDeDonne.DatabaseHandler;
+import com.yenimobile.suiviincident.adapters.IncidentListAdapter;
+import com.yenimobile.suiviincident.baseDeDonne.CustomerDAO;
+import com.yenimobile.suiviincident.baseDeDonne.IncidentDAO;
 import com.yenimobile.suiviincident.model.Customer;
 import com.yenimobile.suiviincident.model.Incident;
 
-import org.w3c.dom.Text;
-
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
-    DatabaseHandler db;
+    private TextView headerText;
+    private FloatingActionButton fabAddincident;
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    public static final String ARG_ITEM_ID = "incident_list";
+
+    private ListView incidentListView;
+    private ArrayList<Incident> incidentArrayList;
+
+    private IncidentListAdapter adapter;
+    private IncidentDAO incidentDAO;
+    private CustomerDAO customerDAO;
+
+    private GetIncidentTask task;
+
+    private FirstLaunchManager firstLaunchManager;
+
+
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
 
-
-
-        /* for testing purpose we populate the database with dummy data */
-
-        db = new DatabaseHandler(this);
-
-        //we create the customers for testing
-        Customer cust1 = new Customer("Dupont", "Jean");
-        Customer cust2 = new Customer("Martin", "Jean");
-        Customer cust3 = new Customer("ETS Billou", "SARL");
-        Customer cust4 = new Customer("ETS Vieux", "SA");
-
-        //we insert customers into the database
-        long cust1_id = db.createCustomer(cust1);
-        long cust2_id = db.createCustomer(cust2);
-        long cust3_id = db.createCustomer(cust3);
-        long cust4_id = db.createCustomer(cust4);
-
-        Log.d("customers Count", "customers Count is:::: " + db.getAllCustomers().size());
-
-        //we create the incidents
-        Incident inc1 = new Incident("facture impayée", "05/09/17", "05/09/17");
-        Incident inc2 = new Incident("contrat non reçu", "12/07/17", "15/07/17");
-        Incident inc3 = new Incident("paiement non reçu", "11/07/17", "11/07/17");
-        Incident inc4 = new Incident("facture impayée", "01/02/17", "09/03/17");
-
-
-        //inserting incidents into db
-        //with the customer reliated to it
-        long inc1_id = db.createIncident(inc1, new long[] { cust1_id });
-        long inc2_id = db.createIncident(inc2, new long[] { cust2_id });
-        long inc3_id = db.createIncident(inc3, new long[] { cust3_id });
-        long inc4_id = db.createIncident(inc4, new long[] { cust4_id });
-
-        //we list all the customers
-        List<Customer> allCustomers = db.getAllCustomers();
-        for (Customer customer : allCustomers) {
-            Log.d("Customer Name", customer.getName());
+        incidentDAO = new IncidentDAO(this);
+        customerDAO = new CustomerDAO(this);
+        firstLaunchManager = new FirstLaunchManager(this);
+        if(firstLaunchManager.isFirstTimeLaunch()){
+            Log.e("Mainnnnnnn", "this is the first launch ");
+            //we insert some dummy data
+            insertDummyData();
+            firstLaunchManager.setFirstTimeLaunch(false);
         }
-
-
-        //we list all the incidents
-        List<Incident> allIncidents = db.getAllIncidents();
-        for(Incident incident : allIncidents){
-            Log.d("Incident Name", incident.getName());
-        }
-
-
-
 
         /* initiate and populate the listview */
-        MyAdapter adapter = new MyAdapter();
-        ListView listView = (ListView) findViewById(R.id.listView);
+        incidentArrayList = (ArrayList<Incident>) incidentDAO.getAllIncidents();
+        adapter = new IncidentListAdapter(this, incidentArrayList);
+        incidentListView = (ListView) findViewById(R.id.listview);
+        incidentListView.setClickable(true);
+        incidentListView.setAdapter(adapter);
 
-
-        //we add incidents to the list vew
-        for(Incident incident : allIncidents){
-            adapter.addIncident(incident);
-        }
-
-        listView.setAdapter(adapter);
-
-
-
-        //closing db connexion
-        db.closeDB();
-
-
-
-
-    }
-
-
-    public class MyAdapter extends BaseAdapter{
-
-        ArrayList<Incident> incidentArrayList = new ArrayList<Incident>();
-
-        public void addIncident(Incident incident){
-            incidentArrayList.add(incident);
-            notifyDataSetChanged();
-        }
-
-
-
-        @Override
-        public int getCount() {
-            return incidentArrayList.size();
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return incidentArrayList.get(i);
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return i;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            if(view == null){
-                LayoutInflater inflater = getLayoutInflater();
-                view = inflater.inflate(R.layout.list_item, viewGroup, false);
+        incidentListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Incident itemIncident = adapter.getItem(i);
+                adapter.remove(itemIncident);
+                incidentDAO.deleteIncident(itemIncident);
+                return false;
             }
+        });
+        fabAddincident = (FloatingActionButton) findViewById(R.id.fab);
+        //task = new GetIncidentTask(this);
+        //task.execute((Void) null);
 
-            Incident tempIncident = incidentArrayList.get(i);
 
-            TextView textName = (TextView) view.findViewById(R.id.text_name);
-            TextView textCustomer = (TextView) view.findViewById(R.id.text_client);
-            TextView textCreatedAt = (TextView) view.findViewById(R.id.text_createdAt);
-            TextView textModifiedAt = (TextView) view.findViewById(R.id.text_modifiedAt);
-            Button btnOpen = (Button) view.findViewById(R.id.btnOpen);
-            btnOpen.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Toast.makeText(getApplicationContext(), "action available soon", Toast.LENGTH_SHORT).show();
+
+
+    }
+
+
+    public class GetIncidentTask extends AsyncTask<Void, Void, ArrayList<Incident>> {
+
+        private final WeakReference<Activity> activityWeakRef;
+
+        public GetIncidentTask(Activity context) {
+            this.activityWeakRef = new WeakReference<Activity>(context);
+        }
+
+        @Override
+        protected ArrayList<Incident> doInBackground(Void... arg0) {
+            ArrayList<Incident> incidentArrayListBackground = (ArrayList<Incident>) incidentDAO.getAllIncidents();
+            return incidentArrayListBackground;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<Incident> incidentArrayList) {
+            if (activityWeakRef.get() != null && !activityWeakRef.get().isFinishing()) {
+
+                MainActivity.this.incidentArrayList = incidentArrayList;
+                if (incidentArrayList != null) {
+                    if (incidentArrayList.size() != 0) {
+                        adapter = new IncidentListAdapter(MainActivity.this, incidentArrayList);
+                        incidentListView.setAdapter(adapter);
+                        incidentListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                adapter.remove(adapter.getItem(i));
+                            }
+                        });
+                    } else {
+                        Toast.makeText(MainActivity.this, "No Incident Records", Toast.LENGTH_LONG).show();
+                    }
                 }
-            });
-
-            textName.setText(tempIncident.getName());
-            textCreatedAt.setText(tempIncident.getCreatedAt());
-            textModifiedAt.setText(tempIncident.getModifiedAt());
-
-            return view;
+            }
         }
     }
+
+
+
+
+    private void insertDummyData(){
+
+        String[] inC = {"facture impayée", "contrat non reçu", "paiment non reçu"};
+        Date currentDate = new Date();
+
+        Customer customer0 = customerDAO.createCustomer("Dupont", "Jean");
+        Customer customer1 = customerDAO.createCustomer("Martin", "jean");
+        Customer customer2 = customerDAO.createCustomer("Billou", "ETS");
+        Customer customer3 = customerDAO.createCustomer("Vieux", "ETS");
+
+        Incident incident0 = incidentDAO.createIncident(inC[0], currentDate, currentDate, true, customer0.getId());
+        Incident incident1 = incidentDAO.createIncident(inC[1], currentDate, currentDate, true, customer1.getId());
+        Incident incident2 = incidentDAO.createIncident(inC[2], currentDate, currentDate, false, customer2.getId());
+        Incident incident3 = incidentDAO.createIncident(inC[0], currentDate, currentDate, true, customer3.getId());
+
+    }
+
+
+
+
 
 
 }

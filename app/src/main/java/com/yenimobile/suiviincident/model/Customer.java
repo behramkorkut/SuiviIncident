@@ -3,34 +3,32 @@ package com.yenimobile.suiviincident.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
+
 /**
  * Created by bebeNokiaX6 on 06/09/2017.
  */
 
-public class Customer implements Parcelable {
+public class Customer implements Serializable, Parcelable {
 
-    private int id;
+    private long id;
     private String name;
     private String firstname;
 
     public Customer(){}
 
-    public Customer(int id, String name, String firstname){
-        this.id = id;
+    public Customer(String name, String firstname){
         this.name = name;
         this.firstname = firstname;
     }
 
-    public Customer(String name){
-        this.name = name;
-    }
 
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -57,7 +55,7 @@ public class Customer implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.id);
+        dest.writeInt((int) this.id);
         dest.writeString(this.name);
         dest.writeString(this.firstname);
     }
@@ -85,7 +83,7 @@ public class Customer implements Parcelable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + id;
+        result = (int) (prime * result + id);
         return result;
     }
 

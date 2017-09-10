@@ -3,15 +3,17 @@ package com.yenimobile.suiviincident.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by bebeNokiaX6 on 06/09/2017.
+ * Incident is made Parcelable just in case we need to use intents
  */
 
-public class Incident implements Parcelable {
+public class Incident implements Serializable, Parcelable {
 
-    private int id;
+    private long id;
     private String name;
     private Date createdAt;
     private Date modifiedAt;
@@ -19,8 +21,15 @@ public class Incident implements Parcelable {
     private Customer customer;
 
 
+
+    public Incident(String name, Date createdAt, Date modifiedAt, boolean inProgress) {
+        this.name = name;
+        this.createdAt = createdAt;
+        this.modifiedAt = modifiedAt;
+        this.inProgress = inProgress;
+    }
+
     public Incident() {
-        super();
     }
 
     private Incident(Parcel in) {
@@ -29,16 +38,15 @@ public class Incident implements Parcelable {
         this.name = in.readString();
         this.createdAt = new Date(in.readLong());
         this.modifiedAt = new Date(in.readLong());
-        //this.inProgress = in.readBoolean();
-
+        this.inProgress = Boolean.valueOf(in.readString());
         this.customer = in.readParcelable(Customer.class.getClassLoader());
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -75,8 +83,6 @@ public class Incident implements Parcelable {
     }
 
 
-
-
     public Customer getCustomer() {
         return customer;
     }
@@ -97,7 +103,7 @@ public class Incident implements Parcelable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + id;
+        result = (int) (prime * result + id);
         return result;
     }
 
@@ -122,7 +128,7 @@ public class Incident implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int flags) {
-        parcel.writeInt(getId());
+        parcel.writeInt((int) getId());
         parcel.writeString(getName());
         parcel.writeLong(getCreatedAt().getTime());
         parcel.writeLong(getModifiedAt().getTime());
