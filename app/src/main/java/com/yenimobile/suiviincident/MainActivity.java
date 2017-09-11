@@ -77,8 +77,19 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
+            btnDisplay = (Button) findViewById(R.id.btnDisplay);
+            btnDisplay.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mSelectedOption == (String) spinnerAdapter.getItem(0)){
+                        incidentArrayList = (ArrayList<Incident>) incidentDAO.getAllInProgressIncidents();
+                        adapter = new IncidentListAdapter(MainActivity.this, incidentArrayList);
+                        adapter.notifyDataSetChanged();
+                        incidentListView.setAdapter(adapter);
+                    }
+                }
+            });
         }
-
 
 
 
