@@ -172,6 +172,24 @@ public class IncidentDAO {
         return incidentArrayList;
     }
 
+    public List<Incident> getInProgressIncidents(){
+        boolean inProgress = true;
+        List<Incident> inProgressList = new ArrayList<Incident>();
+        Cursor cursor = mDatabase.query(DataBaseHelper.TABLE_INCIDENT, mAllColumns,
+                DataBaseHelper.KEY_IN_PROGRESS + " = ", new String[] {String.valueOf(inProgress)},
+                null, null, null);
+        if(cursor != null){
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()){
+                Incident incident = getIncidentfromCursor(cursor);
+                inProgressList.add(incident);
+                cursor.moveToNext();
+            }
+            cursor.close();
+        }
+        return inProgressList;
+    }
+
     /**
      * One customer can have many incidents. we want to list them
      * @param customerId

@@ -20,6 +20,29 @@
             android:text="@string/header"
             android:textAlignment="center"
             android:textAppearance="?android:textAppearanceLarge"/>
+        <ImageView
+            android:padding="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:src="@drawable/suivi_incident_image"
+            android:scaleType="centerCrop"/>
+
+        <Spinner
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:id="@+id/spinnerDisplayOptions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:prompt="@string/select_display"
+            android:animateLayoutChanges="true"
+            android:spinnerMode="dropdown"
+            ></Spinner>
+
+        <Button
+            android:id="@+id/btnDisplay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Press here to display incidents"/>
 
         <ListView
             android:id="@+id/listview"

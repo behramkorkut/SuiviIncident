@@ -8,11 +8,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yenimobile.suiviincident.adapters.IncidentListAdapter;
+import com.yenimobile.suiviincident.adapters.SpinnerOptionsAdapter;
 import com.yenimobile.suiviincident.baseDeDonne.CustomerDAO;
 import com.yenimobile.suiviincident.baseDeDonne.IncidentDAO;
 import com.yenimobile.suiviincident.model.Customer;
@@ -21,28 +24,24 @@ import com.yenimobile.suiviincident.model.Incident;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private TextView headerText;
     private FloatingActionButton fabAddincident;
-
     public static final String ARG_ITEM_ID = "incident_list";
-
     private ListView incidentListView;
     private ArrayList<Incident> incidentArrayList;
-
     private IncidentListAdapter adapter;
     private IncidentDAO incidentDAO;
     private CustomerDAO customerDAO;
-
+    private Button btnDisplay;
+    private Spinner optionSpinner;
+    private SpinnerOptionsAdapter spinnerAdapter;
+    private String mSelectedOption;
     private GetIncidentTask task;
-
     private FirstLaunchManager firstLaunchManager;
-
-
-
-
 
 
     @Override
@@ -61,7 +60,28 @@ public class MainActivity extends AppCompatActivity {
             firstLaunchManager.setFirstTimeLaunch(false);
         }
 
-        /* initiate and populate the listview */
+        List<String> displayOptions = insertListOfDisplayOptions();
+        if (displayOptions != null){
+            optionSpinner = (Spinner) findViewById(R.id.spinnerDisplayOptions);
+            spinnerAdapter = new SpinnerOptionsAdapter(this, displayOptions);
+            optionSpinner.setAdapter(spinnerAdapter);
+            optionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    mSelectedOption = (String) spinnerAdapter.getItem(i);
+
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+
+                }
+            });
+        }
+
+
+
+
         incidentArrayList = (ArrayList<Incident>) incidentDAO.getAllIncidents();
         adapter = new IncidentListAdapter(this, incidentArrayList);
         incidentListView = (ListView) findViewById(R.id.listview);
@@ -77,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+
         fabAddincident = (FloatingActionButton) findViewById(R.id.fab);
         //task = new GetIncidentTask(this);
         //task.execute((Void) null);
@@ -142,6 +163,15 @@ public class MainActivity extends AppCompatActivity {
         Incident incident2 = incidentDAO.createIncident(inC[2], currentDate, currentDate, false, customer2.getId());
         Incident incident3 = incidentDAO.createIncident(inC[0], currentDate, currentDate, true, customer3.getId());
 
+    }
+
+    private List<String> insertListOfDisplayOptions(){
+        List<String> options = new ArrayList<String>();
+        options.add("display inProgress incidents only");
+        options.add("display all incidents");
+        options.add("erase all incidents");
+
+        return options;
     }
 
 
